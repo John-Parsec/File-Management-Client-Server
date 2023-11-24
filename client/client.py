@@ -10,7 +10,7 @@ def list(client_socket):
 
     client_socket.send(message)
 
-    response = client_socket.recv(1024).decode('utf-8')
+    response = client_socket.recv(1024)
 
     files = pickle.loads(response)
     imprimir_lista(files)
@@ -46,10 +46,21 @@ def send(client_socket):
 
     send_file(client_socket, file_path)
 
+# def send_file(client_socket, file_path):
+#     file = open(file_path, 'rb').read()
+#     client_socket.sendall(pickle.dumps(file))
+#     client_socket.sendall(b'EOF')
+
 def send_file(client_socket, file_path):
-    file = open(file_path, 'rb').read()
-    client_socket.sendall(pickle.dumps(file))
-    client_socket.sendall(b'EOF')
+    with open(file_path, 'rb') as file:
+        while True:
+            data = file.read(1024)
+            if not data:
+                break
+            client_socket.sendall(data)
+
+        # Enviar marcador de final de arquivo
+        client_socket.sendall(b'EOF')
 
 #Baixa um arquivo do servidor
 def download():
@@ -60,7 +71,7 @@ def download():
 # {resquest: <request>, file_name: <file_name>, file_size: <file_size>, file_path: <file_path> file: <file>}
 #
 def createMessage(resquest, file_name = "", file_size = ""):
-    message = {'request': resquest, 'file_name': file_name, 'file_size': file_size, 'file' : ""}
+    message = {'request': resquest, 'file_name': file_name, 'file_size': file_size}
 
     return pickle.dumps(message)
 
