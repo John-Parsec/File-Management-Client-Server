@@ -1,8 +1,12 @@
 import socket
-import json
 import pickle
 import sys
 import os
+
+from tkinter import *
+
+downloads_directory = 'client/download'
+
 
 #Lista os arquivos disponíveis no servidor
 def list(client_socket):
@@ -13,11 +17,11 @@ def list(client_socket):
     response = client_socket.recv(1024)
 
     files = pickle.loads(response)
-    imprimir_lista(files)
+    print_list(files)
 
-    #print_directory_structure(response)
 
-def imprimir_lista(diretorio, nivel=0):
+
+def print_list(diretorio, nivel=0):
     prefixo = "  " * nivel  # Prefixo para a indentação
 
     # Imprimir arquivos
@@ -27,7 +31,11 @@ def imprimir_lista(diretorio, nivel=0):
     # Recursivamente imprimir diretórios
     for subdir, subdir_content in diretorio.get("Diretorios", {}).items():
         print(f"{prefixo}+ {subdir}/")
-        imprimir_lista(subdir_content, nivel + 1)
+        print_list(subdir_content, nivel + 1)
+
+
+
+
 
 
 #Envia um arquivo para o servidor
@@ -46,11 +54,6 @@ def send(client_socket):
 
     send_file(client_socket, file_path)
 
-# def send_file(client_socket, file_path):
-#     file = open(file_path, 'rb').read()
-#     client_socket.sendall(pickle.dumps(file))
-#     client_socket.sendall(b'EOF')
-
 def send_file(client_socket, file_path):
     with open(file_path, 'rb') as file:
         while True:
@@ -62,9 +65,30 @@ def send_file(client_socket, file_path):
         # Enviar marcador de final de arquivo
         client_socket.sendall(b'EOF')
 
+
+
+
 #Baixa um arquivo do servidor
-def download():
-    pass
+def download(client_socket):
+    file_name = input('Digite o nome do arquivo: ')
+
+    message = createMessage(resquest='baixar', file_name=file_name)
+    client_socket.send(message)
+
+    file_path = os.path.join(downloads_directory, file_name)    
+
+    with open(file_path, 'wb') as file:
+        while True:
+            data = client_socket.recv(1024)
+
+            if not data or b'EOF' in data:
+                break
+            
+            file.write(data)
+
+        print('Arquivo baixado com sucesso')
+
+    
 
 
 #Cria uma mensagem no formato:
@@ -76,8 +100,14 @@ def createMessage(resquest, file_name = "", file_size = ""):
     return pickle.dumps(message)
 
 
+
+
+
 def menu(client_socket):
+    clear = lambda: os.system('clear')
+    
     while True:
+        #clear()
         print('1 - Listar arquivos')
         print('2 - Enviar')
         print('3 - Baixar')
@@ -99,7 +129,7 @@ def menu(client_socket):
 
 def main():
     host = '127.0.0.1'
-    port = 5050
+    port = 5051
 
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client.connect((host, port))

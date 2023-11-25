@@ -1,12 +1,11 @@
 import socket
 import threading
 import sys, os
-import json
 import pickle
 
 
 host = '127.0.0.1'
-port = 5050
+port = 5051
 
 files_directory = 'server/files'
 
@@ -36,6 +35,9 @@ def handle_client(client_socket):
 
             elif request["request"] == 'enviar':
                 upload(client_socket, request)
+
+            elif request["request"] == 'baixar':
+                download(client_socket, request)
 
         except KeyboardInterrupt:
             print('Saindo...')
@@ -67,8 +69,22 @@ def upload(client_socket, request):
 
     with open(file_path, 'wb') as f:
         f.write(file)
-    
 
+
+
+def download(client_socket, request):
+    file_name = request["file_name"]
+    file_path = os.path.join(files_directory, file_name)
+
+    with open(file_path, 'rb') as file:
+        while True:
+            data = file.read(1024)
+            if not data:
+                break
+            client_socket.sendall(data)
+
+        # Enviar marcador de final de arquivo
+        client_socket.sendall(b'EOF')
 
 
 
