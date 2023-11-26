@@ -58,8 +58,7 @@ def print_list(diretorio, nivel=0, tree=None, parent=""):
         item_id = tree.insert(parent, "end", text=f"{prefixo}+ {subdir}/")
         print_list(subdir_content, nivel + 1, tree, item_id)
 
-    if not parent:  # Se for a chamada inicial, inicia o loop da GUI
-        root.mainloop()
+    
 
 
 
@@ -68,7 +67,6 @@ def print_list(diretorio, nivel=0, tree=None, parent=""):
 
 #Envia um arquivo para o servidor
 def send(client_socket):
-    #file_path = input('Digite o caminho do arquivo: ')
     file_path = filedialog.askopenfilename()
 
     if not os.path.isfile(file_path):
@@ -83,6 +81,7 @@ def send(client_socket):
 
     send_file(client_socket, file_path)
 
+
 def send_file(client_socket, file_path):
     with open(file_path, 'rb') as file:
         while True:
@@ -95,25 +94,67 @@ def send_file(client_socket, file_path):
         client_socket.sendall(b'EOF')
 
 
+def download(client_socket):
+    root = tk.Tk()
+    root.title("Selecionar Arquivo para Download")
+
+    tree = ttk.Treeview(root)
+    tree.heading("#0", text="Arquivos e Diretórios")
+    tree.pack(expand=True, fill=tk.BOTH)
+
+    # Função para obter o caminho do arquivo selecionado
+    def get_selected_file():
+        selected_item = tree.selection()
+        if selected_item:
+            selected_text = tree.item(selected_item, "text")
+            if selected_text.startswith("+ "):  # Ignora os diretórios
+                return
+            file_name = selected_text.split("- ")[1]
+            download_file(client_socket, file_name)
+            root.destroy()
+    
+    message = createMessage(resquest='listar')
+
+    client_socket.send(message)
+
+    response = client_socket.recv(2048)
+
+    diretorio = pickle.loads(response)
+
+    # Adiciona os itens à árvore
+    print_list(diretorio, tree=tree)
+
+    # Adiciona botão de download
+    download_button = ttk.Button(root, text="Download", command=get_selected_file)
+    download_button.pack()
+
+    root.mainloop()
+
 
 
 #Baixa um arquivo do servidor
-def download(client_socket):
-    file_name = input('Digite o nome do arquivo: ')
+def download_file(client_socket, file_path):
+    #file_name = input('Digite o nome do arquivo: ')
 
-    message = createMessage(resquest='baixar', file_name=file_name)
+    message = createMessage(resquest='baixar', file_name=file_path)
     client_socket.send(message)
 
-    file_path = os.path.join(downloads_directory, file_name)    
+    file_name = os.path.basename(file_path)
 
-    with open(file_path, 'wb') as file:
+    file_name = os.path.join(downloads_directory, file_name)    
+
+    file_data = b''
+
+    with open(file_name, 'wb') as file:
         while True:
             data = client_socket.recv(2048)
 
             if not data or b'EOF' in data:
                 break
-            
-            file.write(data)
+                
+            file_data += data
+        
+        file.write(data)
 
         print('Arquivo baixado com sucesso')
 
@@ -121,7 +162,7 @@ def download(client_socket):
 
 
 #Cria uma mensagem no formato:
-# {resquest: <request>, file_name: <file_name>, file_size: <file_size>, file_path: <file_path> file: <file>}
+# {resquest: <request>, file_name: <file_name>, file_size: <file_size>, file_path: <file_path>}
 #
 def createMessage(resquest, file_name = "", file_size = ""):
     message = {'request': resquest, 'file_name': file_name, 'file_size': file_size}
@@ -130,35 +171,9 @@ def createMessage(resquest, file_name = "", file_size = ""):
 
 
 
-
-
-# def menu(client_socket):
-#     clear = lambda: os.system('clear')
-    
-#     while True:
-#         #clear()
-#         print('1 - Listar arquivos')
-#         print('2 - Enviar')
-#         print('3 - Baixar')
-#         print('4 - Sair')
-#         print('Digite a opção desejada: ', end='')
-
-#         opcao = int(input())
-
-#         if opcao == 1:
-#             list(client_socket)
-#         elif opcao == 2:
-#             send(client_socket)
-#         elif opcao == 3:
-#             download(client_socket)
-#         elif opcao == 4:
-#             break
-#         else:
-#             print('Opção inválida')
-
 def menu(client_socket):
-    janela = tk.Tk()
-    janela.title("Menu")
+    mainWindow = tk.Tk()
+    mainWindow.title("Menu")
 
     def on_list_files():
         list(client_socket)
@@ -170,10 +185,10 @@ def menu(client_socket):
         download(client_socket)
 
     # Botões para cada opção do menu
-    btn_listar = tk.Button(janela, text="Listar Arquivos", command=on_list_files)
-    btn_enviar = tk.Button(janela, text="Enviar Arquivo", command=on_send_file)
-    btn_baixar = tk.Button(janela, text="Baixar Arquivo", command=on_download_file)
-    btn_sair = tk.Button(janela, text="Sair", command=janela.quit)
+    btn_listar = tk.Button(mainWindow, text="Listar Arquivos", command=on_list_files)
+    btn_enviar = tk.Button(mainWindow, text="Enviar Arquivo", command=on_send_file)
+    btn_baixar = tk.Button(mainWindow, text="Baixar Arquivo", command=on_download_file)
+    btn_sair = tk.Button(mainWindow, text="Sair", command=mainWindow.quit)
 
     # Posicionamento dos botões na janela
     btn_listar.pack(pady=10)
@@ -181,7 +196,7 @@ def menu(client_socket):
     btn_baixar.pack(pady=10)
     btn_sair.pack(pady=10)
 
-    janela.mainloop()
+    mainWindow.mainloop()
 
 def main():
     host = '127.0.0.1'

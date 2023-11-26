@@ -96,8 +96,6 @@ def list_directory_contents(directory):
     return files, subdirectories
 
 def list():
-    #current_directory = os.path.dirname(__file__)
-
     files_directories = list_directory_contents(files_directory)
 
     directory_structure = {'Arquivos': files_directories[0], 'Diretorios': {}}
