@@ -25,7 +25,7 @@ def main():
 def handle_client(client_socket):
     while True:
         try:
-            request = client_socket.recv(1024)
+            request = client_socket.recv(2048)
             
             request = pickle.loads(request)
 
@@ -53,7 +53,7 @@ def upload(client_socket, request):
     file = b''
 
     while True:
-        data = client_socket.recv(1024)
+        data = client_socket.recv(2048)
         if not data:
             break
         if b'EOF' in data:
@@ -78,7 +78,7 @@ def download(client_socket, request):
 
     with open(file_path, 'rb') as file:
         while True:
-            data = file.read(1024)
+            data = file.read(2048)
             if not data:
                 break
             client_socket.sendall(data)
