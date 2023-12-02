@@ -11,7 +11,7 @@ downloads_directory = './download'
 
 def main():
     host = '127.0.0.1'
-    port = 5051
+    port = 5050
 
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     client.connect((host, port))
@@ -37,12 +37,18 @@ def menu(client_socket):
 
     def onDownloadFile():
         download(client_socket)
+    
+    def onExit():
+        message = createMessage(resquest='DISCONNECT')
+        client_socket.send(message)
+        client_socket.close()
+        mainWindow.quit()
 
     # Botões para cada opção do menu
     btn_listar = tk.Button(mainWindow, text="Listar Arquivos", command=onListFiles)
     btn_enviar = tk.Button(mainWindow, text="Enviar Arquivo", command=onSendFile)
     btn_baixar = tk.Button(mainWindow, text="Baixar Arquivo", command=onDownloadFile)
-    btn_sair = tk.Button(mainWindow, text="Sair", command=mainWindow.quit)
+    btn_sair = tk.Button(mainWindow, text="Sair", command=onExit)
 
     # Posicionamento dos botões na janela
     btn_listar.pack(pady=10)

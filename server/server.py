@@ -4,7 +4,7 @@ import sys, os
 import pickle
 
 host = '127.0.0.1'
-port = 5051
+port = 5050
 
 files_directory = './files'
 
@@ -20,7 +20,6 @@ def main():
 
         client_handler = threading.Thread(target=handle_client, args=(client,))
         client_handler.start()
-    
 
 
 def handle_client(client_socket):
@@ -40,14 +39,16 @@ def handle_client(client_socket):
             elif request["request"] == 'DOWNLOAD':
                 download(client_socket, request)
 
-        except KeyboardInterrupt:
-            print('Saindo...')
-            sys.exit(0)
+            elif request["request"] == 'DISCONNECT':
+                client_socket.close()
+                break
+
         except pickle.UnpicklingError:
             print("Arquivo corrompido recebido")
         except Exception as e:
-            print(f"Erro desconhecido: {e}")
-
+            print(f"Erro: {e}")
+            client_socket.close()
+            break
 
 
 def upload(client_socket, request):
@@ -76,7 +77,6 @@ def upload(client_socket, request):
         f.write(file)
 
 
-
 def download(client_socket, request):
     file_name = request["file_name"]
     file_path = os.path.join(files_directory, file_name)
@@ -90,8 +90,6 @@ def download(client_socket, request):
 
         # Enviar marcador de final de arquivo
         client_socket.sendall(b'EOF')
-
-
 
 
 def listDirectoryContents(directory):
@@ -111,7 +109,6 @@ def list():
         directory_structure['Diretorios'][subdirectory] = {'Arquivos': subdirectory_content[0], 'Diretorios': {}}
 
     return  pickle.dumps(directory_structure)
-
 
 
 if __name__ == '__main__':
