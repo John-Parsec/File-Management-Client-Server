@@ -43,6 +43,10 @@ def handle_client(client_socket):
         except KeyboardInterrupt:
             print('Saindo...')
             sys.exit(0)
+        except pickle.UnpicklingError:
+            print("Arquivo corrompido recebido")
+        except Exception as e:
+            print(f"Erro desconhecido: {e}")
 
 
 
@@ -54,7 +58,7 @@ def upload(client_socket, request):
     file = b''
 
     while True:
-        data = client_socket.recv(2048)
+        data = client_socket.recv(1000000)
         if not data:
             break
         if b'EOF' in data:
@@ -79,7 +83,7 @@ def download(client_socket, request):
 
     with open(file_path, 'rb') as file:
         while True:
-            data = file.read(2048)
+            data = file.read(1000000)
             if not data:
                 break
             client_socket.sendall(data)

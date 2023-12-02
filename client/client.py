@@ -121,7 +121,7 @@ def upload(client_socket):
 def uploadFile(client_socket, file_path):
     with open(file_path, 'rb') as file:
         while True:
-            data = file.read(2048)
+            data = file.read(1000000)
             if not data:
                 break
             client_socket.sendall(data)
@@ -179,7 +179,7 @@ def downloadFile(client_socket, file_path):
     file = b''
 
     while True:
-        data = client_socket.recv(2048)
+        data = client_socket.recv(1000000)
         if not data:
             break
         if b'EOF' in data:
