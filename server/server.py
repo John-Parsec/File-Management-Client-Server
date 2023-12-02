@@ -3,16 +3,16 @@ import threading
 import sys, os
 import pickle
 
-
 host = '127.0.0.1'
 port = 5051
 
-files_directory = 'server/files'
+files_directory = './files'
 
 def main():
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server.bind((host, port))
     server.listen(5)
+    print(f"[*] Servidor escutando em {host}:{port}")
 
     while True:
         client, address = server.accept()
@@ -22,6 +22,7 @@ def main():
         client_handler.start()
     
 
+
 def handle_client(client_socket):
     while True:
         try:
@@ -29,14 +30,14 @@ def handle_client(client_socket):
             
             request = pickle.loads(request)
 
-            if request["request"] == 'listar':
+            if request["request"] == 'LIST':
                 response = list()
                 client_socket.send(response)
 
-            elif request["request"] == 'enviar':
+            elif request["request"] == 'UPLOAD':
                 upload(client_socket, request)
 
-            elif request["request"] == 'baixar':
+            elif request["request"] == 'DOWNLOAD':
                 download(client_socket, request)
 
         except KeyboardInterrupt:
@@ -89,20 +90,20 @@ def download(client_socket, request):
 
 
 
-def list_directory_contents(directory):
+def listDirectoryContents(directory):
     content = os.listdir(directory)
     files = [item for item in content if os.path.isfile(os.path.join(directory, item))]
     subdirectories = [item for item in content if os.path.isdir(os.path.join(directory, item))]
     return files, subdirectories
 
 def list():
-    files_directories = list_directory_contents(files_directory)
+    files_directories = listDirectoryContents(files_directory)
 
     directory_structure = {'Arquivos': files_directories[0], 'Diretorios': {}}
 
     for subdirectory in files_directories[1]:
         subdirectory_path = os.path.join(files_directory, subdirectory)
-        subdirectory_content = list_directory_contents(subdirectory_path)
+        subdirectory_content = listDirectoryContents(subdirectory_path)
         directory_structure['Diretorios'][subdirectory] = {'Arquivos': subdirectory_content[0], 'Diretorios': {}}
 
     return  pickle.dumps(directory_structure)
