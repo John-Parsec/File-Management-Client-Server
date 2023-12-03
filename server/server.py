@@ -21,6 +21,7 @@ def main():
         client_handler = threading.Thread(target=handle_client, args=(client,))
         client_handler.start()
 
+
 def handle_client(client_socket: socket.socket):
     """
     Trata a conexão com um cliente e as requisições enviadas por ele.
@@ -56,6 +57,7 @@ def handle_client(client_socket: socket.socket):
             client_socket.close()
             break
 
+
 def upload(client_socket: socket.socket, request: dict):
     """
     Recebe um arquivo enviado por um cliente e o salva no servidor.
@@ -89,6 +91,7 @@ def upload(client_socket: socket.socket, request: dict):
     with open(file_path, 'wb') as f:        
         f.write(file)                                           # Salva o arquivo no servidor
 
+
 def download(client_socket: socket.socket, request: dict):
     """
     Envia um arquivo do servidor para um cliente.
@@ -110,6 +113,7 @@ def download(client_socket: socket.socket, request: dict):
 
         client_socket.sendall(b'EOF')                       # Enviar marcador de final de arquivo
 
+
 def listDirectoryContents(directory: str):
     """
     Recebe como parametro o caminho de um diretório.
@@ -121,6 +125,7 @@ def listDirectoryContents(directory: str):
     subdirectories = [item for item in content if os.path.isdir(os.path.join(directory, item))]
 
     return files, subdirectories
+
 
 def list():
     """
