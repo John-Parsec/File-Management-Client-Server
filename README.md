@@ -112,7 +112,7 @@ O servidor e os clientes devem ser capazes de se comunicar pela rede. Certifique
 ### Tratamento de Erros:
 
 O software lida com a maioria dos erros possiveis mantendo as conexões enquanto possivel e mantendo sempre o servidor online.
-Em casos de erros que levem a encerrar a conexão o servidor se manterá online, por tanto basta conectar novamente.
+Em casos de erros que levem a encerrar a conexão o servidor se manterá online, portanto basta conectar novamente.
 Em casos de erros que impessa a transmissão de novas mensagens e novas conexões, reinicie o servidor.
 
 
@@ -120,10 +120,44 @@ Em casos de erros que impessa a transmissão de novas mensagens e novas conexõe
 
 ## Estrutura das Mensagens
 As mensagens são divididas em 2 tipos:
-- Requisições: {resquest: <REQUEST>, file_name: <file_name>, file_size: <file_size>, file_path: <file_path>}
-- Arquivos: uma sequencia em binario, após uma requisição, que represeta os dados do arquivo terminada com uma flag 'EOF' em binario.
+- _Requisição_: {resquest: <REQUEST>, file_name: <file_name>, file_size: <file_size>}
+- _Arquivo_: uma sequencia de binario, após uma requisição, que representa os dados do arquivo terminada com uma flag 'EOF' em binario.
+- _Lista_: uma sequencia de bytes que representa uma lista de arquivos.
 
 ## Mensagens
+
+### Cliente para Servidor
+
+#### LIST
+Requisição de lista de arquivos disponiveis no servidor.  
+Formato: {request: 'LIST', file_name: "", file_size: ""}
+
+*Resposta do servidor -> _Lista_
+
+#### UPLOAD
+Requisição de enviar arquivo para o servidor.
+Formato: {request: 'UPLOAD', file_name: <nome_do_arquivo>, file_size: <tamanho_do_arquivo>}
+
+#### DOWNLOAD
+Requisição de baixar arquivo do servidor.
+Formato: {request: 'DOWNLOAD', file_name: <nome_do_arquivo>, file_size: ""}
+
+*Resposta do servidor -> _Arquivo_
+
+#### DELETE
+Requisição de deletar arquivo no servidor.
+Formato: {request: 'DELETE', file_name: <nome_do_arquivo>, file_size: ""}
+
+### Servidor para Cliente
+
+#### Arquivo
+Uma sequencia de binario que representa os dados de um arquivo terminada com uma flag 'EOF' em binario.
+
+#### Lista
+Uma sequencia de bytes que representa uma lista de arquivos.
+
+### Comunicação
+![Comuniação do Protocolo](assets/comunicação-protocolo.jpg)
 
 
 ## Eventos

@@ -91,7 +91,7 @@ def menu(client_socket: socket.socket):
 
 def createMessage(resquest: dict, file_name: str = "", file_size: str = "") -> bytes:
     """
-    Cria uma mensagem para o servidor no formato: {resquest: <request>, file_name: <file_name>, file_size: <file_size>, file_path: <file_path>}
+    Cria uma mensagem para o servidor no formato: {resquest: <request>, file_name: <file_name>, file_size: <file_size>}
 
     Retorna a mensagem serializada em bytes
     """
