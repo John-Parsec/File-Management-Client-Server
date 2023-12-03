@@ -36,30 +36,54 @@ def menu(client_socket: socket.socket):
     mainWindow.maxsize(300, 250)
 
     def onListFiles():
-        list(client_socket)
+        try:
+            list(client_socket)
+        except Exception as e:
+            print(e)
+            return
 
     def onSendFile():
-        upload(client_socket)
+        try:
+            upload(client_socket)
+        except Exception as e:
+            print(e)
+            return
 
     def onDownloadFile():
-        download(client_socket)
+        try:
+            download(client_socket)
+        except Exception as e:
+            print(e)
+            return
     
+    def onDeleteFile():
+        try:
+            delete(client_socket)
+        except Exception as e:
+            print(e)
+            return
+
     def onExit():
-        message = createMessage(resquest='DISCONNECT')
-        client_socket.send(message)
-        client_socket.close()
+        try:
+            client_socket.close()
+        except Exception as e:
+            pass
+        
         mainWindow.quit()
 
     # Botões para cada opção do menu
     btn_listar = tk.Button(mainWindow, text="Listar Arquivos", command=onListFiles)
     btn_enviar = tk.Button(mainWindow, text="Enviar Arquivo", command=onSendFile)
     btn_baixar = tk.Button(mainWindow, text="Baixar Arquivo", command=onDownloadFile)
+    btn_deletar = tk.Button(mainWindow, text="Deletar Arquivo", command=onDeleteFile)
     btn_sair = tk.Button(mainWindow, text="Sair", command=onExit)
+
 
     # Posicionamento dos botões na janela
     btn_listar.pack(pady=10)
     btn_enviar.pack(pady=10)
     btn_baixar.pack(pady=10)
+    btn_deletar.pack(pady=10)
     btn_sair.pack(pady=10)
 
     mainWindow.mainloop()
@@ -185,7 +209,8 @@ def download(client_socket: socket.socket):
             if selected_text.startswith("+ "):  # Ignora os diretórios
                 return
             
-            file_name = selected_text.split("- ")[1]
+            file_name = selected_text[2:]
+            print(f"Baixando {file_name}...")
             downloadFile(client_socket, file_name)
             root.destroy()
 
@@ -241,6 +266,63 @@ def downloadFile(client_socket: socket.socket, file_path: str):
         f.write(file)
 
     print('Arquivo baixado com sucesso')
+
+
+def delete(client: socket.socket):
+    """
+    Exibe uma janela para selecionar um arquivo e deleta o arquivo do servidor.
+
+    Recebe um socket conectado a um cliente
+    """
+
+    root = tk.Tk()                                              # Cria uma nova janela
+    root.title("Selecionar Arquivo para Deletar")
+
+    tree = ttk.Treeview(root)
+    tree.heading("#0", text="Arquivos e Diretórios")
+    tree.pack(expand=True, fill=tk.BOTH)
+
+    # Função para obter o caminho do arquivo selecionado
+    def getSelectedFile():
+        selected_item = tree.selection()
+
+        if selected_item:
+            selected_text = tree.item(selected_item, "text")
+
+            if selected_text.startswith("+ "):  # Ignora os diretórios
+                return
+            
+            file_name = selected_text[2:]
+            print(f"Deletando {file_name}...")
+            deleteFile(client, file_name)
+            root.destroy()
+
+    message = createMessage(resquest='LIST')                # Envia uma requisição da lista de arquivos e diretórios para o servidor
+
+    client.send(message)
+
+    response = client.recv(2048)
+
+    directory = pickle.loads(response)
+
+    # Exibe os arquivos e diretórios na árvore
+    printFiles(directory, tree=tree)                            
+
+    # Adiciona botão de download
+    download_button = ttk.Button(root, text="Deletar", command=getSelectedFile)
+    download_button.pack()
+
+    root.mainloop()
+
+
+def deleteFile(client: socket.socket, file_path: str):
+    """
+    Exclui um arquivo do servidor.
+
+    Recebe um socket conectado a um cliente e o caminho do arquivo a ser excluído.
+    """
+    message = createMessage(resquest='DELETE', file_name=file_path)
+    client.send(message)
 
 
 if __name__ == '__main__':

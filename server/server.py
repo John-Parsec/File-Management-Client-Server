@@ -3,12 +3,12 @@ import threading
 import os
 import pickle
 
-host = '127.0.0.1'
-port = 5050
-
 files_directory = './files'
 
 def main():
+    host = '127.0.0.1'
+    port = 5050
+
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server.bind((host, port))
     server.listen(5)
@@ -45,9 +45,8 @@ def handle_client(client_socket: socket.socket):
             elif request["request"] == 'DOWNLOAD':
                 download(client_socket, request)
 
-            elif request["request"] == 'DISCONNECT':
-                client_socket.close()
-                break
+            elif request["request"] == 'DELETE':
+                delete(request)
 
         except pickle.UnpicklingError:                      # Tratamento de erro para requisições corrompidas
             print("Arquivo corrompido recebido")
@@ -114,11 +113,32 @@ def download(client_socket: socket.socket, request: dict):
         client_socket.sendall(b'EOF')                       # Enviar marcador de final de arquivo
 
 
+def delete(request: dict):
+    """
+    Exclui um arquivo do servidor.
+
+    Recebe como parametros um socket conectado a um cliente e um dicionário com a requisição.
+    """
+
+    file_name = request["file_name"]                    # Extrai o nome do arquivo da requisição
+    print(f"[*] Excluindo {file_name}...")
+
+    file_path = os.path.join(files_directory, file_name)        # Caminho do arquivo no servidor
+
+    if os.path.isfile(file_path):
+        os.remove(file_path)                            # Exclui o arquivo do servidor
+        print(f"[*] Arquivo {file_name} excluido com sucesso")
+
+    else:
+        print(f"[*] Arquivo {file_name} não encontrado")
+
+
 def listDirectoryContents(directory: str):
     """
     Recebe como parametro o caminho de um diretório.
     Retorna uma tupla com uma lista de arquivos e uma lista de subdiretórios.
     """
+
     content = os.listdir(directory)
 
     files = [item for item in content if os.path.isfile(os.path.join(directory, item))]
