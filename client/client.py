@@ -60,7 +60,7 @@ def menu(client_socket):
 
 
 
-#Cria uma mensagem no formato:
+# Cria uma mensagem no formato:
 # {resquest: <request>, file_name: <file_name>, file_size: <file_size>, file_path: <file_path>}
 def createMessage(resquest, file_name = "", file_size = ""):
     message = {'request': resquest, 'file_name': file_name, 'file_size': file_size}
@@ -70,7 +70,7 @@ def createMessage(resquest, file_name = "", file_size = ""):
 
 
 
-#Lista os arquivos disponíveis no servidor
+# Lista os arquivos disponíveis no servidor
 def list(client_socket):
     message = createMessage(resquest='LIST')
 
@@ -107,7 +107,7 @@ def printFiles(directory, level=0, tree=None, parent=""):
 
 
 
-#Envia um arquivo para o servidor
+# Envia um arquivo para o servidor
 def upload(client_socket):
     file_path = filedialog.askopenfilename()
 
