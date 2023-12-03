@@ -118,11 +118,10 @@ Em casos de erros que impessa a transmissão de novas mensagens e novas conexõe
 
 # Protocolo de Aplicação Cliente-Servidor
 
-## Introdução
-
-
 ## Estrutura das Mensagens
-
+As mensagens são divididas em 2 tipos:
+- Requisições: {resquest: <REQUEST>, file_name: <file_name>, file_size: <file_size>, file_path: <file_path>}
+- Arquivos: uma sequencia em binario, após uma requisição, que represeta os dados do arquivo terminada com uma flag 'EOF' em binario.
 
 ## Mensagens
 

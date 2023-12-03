@@ -35,17 +35,18 @@ def handle_client(client_socket: socket.socket):
             
             request = pickle.loads(request)                     # Converte a requisição para um dicionário
 
-            if request["request"] == 'LIST':
+            # Tratamento de requisições
+            if request["request"] == 'LIST':                    # Requisição de listagem de arquivos
                 response = list()
                 client_socket.send(response)
 
-            elif request["request"] == 'UPLOAD':
+            elif request["request"] == 'UPLOAD':                # Requisição de envio de arquivo para o servidor
                 upload(client_socket, request)
 
-            elif request["request"] == 'DOWNLOAD':
+            elif request["request"] == 'DOWNLOAD':              # Requisição de download de arquivo do servidor
                 download(client_socket, request)
 
-            elif request["request"] == 'DELETE':
+            elif request["request"] == 'DELETE':                # Requisição de exclusão de arquivo do servidor
                 delete(request)
 
         except pickle.UnpicklingError:                      # Tratamento de erro para requisições corrompidas
