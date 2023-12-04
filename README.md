@@ -175,10 +175,6 @@ Uma sequencia de bytes que representa uma lista de arquivos.
 |     -->         |  mensagem: requisição DELETE    |              |
 |     -->         |        Fechar conexão           |              |
 
-
-
-
-
 ## Eventos
 - Evento: Recebimento de uma Requisição:
   - Descrição: O servidor recebe uma requisição do cliente.
@@ -269,9 +265,3 @@ Uma sequencia de bytes que representa uma lista de arquivos.
 - Descrição: O servidor encontrou um erro durante o processamento da requisição.
 - Transição:
   - Evento: Recebimento de uma nova requisição.
-
-
-
-
-
-
