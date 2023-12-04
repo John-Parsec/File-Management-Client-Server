@@ -157,8 +157,11 @@ Uma sequencia de binario que representa os dados de um arquivo terminada com uma
 Uma sequencia de bytes que representa uma lista de arquivos.
 
 ### Comunicação
+
+#### Grafico
 ![Comuniação do Protocolo](assets/comunicação-protocolo.jpg)
 
+#### Tabela
 | **Cliente**     |         **Operação**            | **Servidor** |
 |:-----------:    |:---------------------------:    |:------------:|
 |     -->         |      Requisita conexão          |              |
