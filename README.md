@@ -177,92 +177,94 @@ Uma sequencia de bytes que representa uma lista de arquivos.
 
 
 ## Eventos
-- Evento: Recebimento de uma Requisição (RequisicaoRecebida):
+- Evento: Recebimento de uma Requisição:
   - Descrição: O servidor recebe uma requisição do cliente.
   - Transições possíveis:
     - Próximo Estado: Estado de destino dependendo do tipo de requisição.
-  
-- Evento: Envio bem-sucedido da Lista de Arquivos (EnvioListaArquivosBemSucedido):
-  - Descrição: O servidor enviou com sucesso a lista de arquivos solicitada pelo cliente.
+
+
+- Evento: Envio da Lista de Arquivos:
+  - Descrição: O servidor recebeu a requisição de envio da lista de arquivos solicitada pelo cliente.
   - Transições possíveis:
-    - Próximo Estado: Estado de Listagem (Listagem).
+    - Próximo Estado: Estado Ocioso.
     - Ação: Envia a lista de arquivos ao cliente.
   
-- Evento: Recebimento bem-sucedido do Arquivo (RecebimentoArquivoBemSucedido):
-  - Descrição: O servidor recebeu com sucesso um arquivo enviado pelo cliente (upload).
+- Evento: Recebimento do Arquivo:
+  - Descrição: O servidor recebeu a requisição de upload de um arquivo enviado pelo cliente.
   - Transições possíveis:
-    - Próximo Estado: Estado de Recebimento de Arquivo (RecebendoArquivo).
+    - Próximo Estado: Estado de Recebimento de Arquivo.
     - Ação: Inicia o processo de recebimento do arquivo.
   
-- Evento: Envio bem-sucedido do Arquivo (EnvioArquivoBemSucedido):
-  - Descrição: O servidor enviou com sucesso um arquivo solicitado pelo cliente (download).
+- Evento: Envio do Arquivo:
+  - Descrição: O servidor recebeu a requisição de donwload de um arquivo do servidor.
   - Transições possíveis:
-    - Próximo Estado: Estado de Envio de Arquivo (EnviandoArquivo).
+    - Próximo Estado: Estado de Envio de Arquivo.
     - Ação: Inicia o processo de envio do arquivo.
   
-- Evento: Exclusão bem-sucedida de Arquivo (ExclusaoArquivoBemSucedida):
+- Evento: Exclusão de Arquivo:
   - Descrição: O servidor excluiu com sucesso um arquivo solicitado pelo cliente.
   - Transições possíveis:
-    - Próximo Estado: Estado de Exclusão (Exclusão).
+    - Próximo Estado: Estado Ocioso.
     - Ação: Executa a exclusão do arquivo.
   
-- Evento: Erro no Processamento (ErroProcessamento):
+- Evento: Erro no Processamento:
   - Descrição: O servidor encontrou um erro durante o processamento da requisição.
   - Transições possíveis:
-    - Próximo Estado: Estado de Erro (Erro).
+    - Próximo Estado: Estado de Erro.
     - Ação: Trata o erro.
 
 ## Estados
 #### Estado Inicial (Inicial):
 
 - Descrição: O estado inicial antes de receber qualquer requisição.
-- Transições possíveis:
+- Transição:
+  - Evento: Recebimento de uma requisição.
+
+#### Estado Ocioso
+- Descrição: O servidor está esperando receber alguma requisição.
+- Transição:
   - Evento: Recebimento de uma requisição.
 
 #### Estado de Listagem (LIST):
 
 - Descrição: O servidor recebeu uma requisição para listar arquivos.
-- Transições possíveis:
-  - Evento: Envio bem-sucedido da lista de arquivos.
-  - Evento: Recebimento de uma nova requisição.
+- Transição:
+  - Evento: Envio da Lista de Arquivos.
 
 #### Estado de Upload (UPLOAD):
 
 - Descrição: O servidor recebeu uma requisição para upload de um arquivo.
-- Transições possíveis:
+- Transição:
   - Evento: Recebimento do arquivo.
 
 #### Estado de Recebimento de Arquivo (RecebendoArquivo):
 
 - Descrição: O servidor está no processo de receber um arquivo (upload).
-- Transições possíveis:
-    - Evento: Recebimento bem-sucedido do arquivo.
+- Transição:
     - Evento: Recebimento de uma nova requisição.
 
 #### Estado de Download (DOWNLOAD):
 
 - Descrição: O servidor recebeu uma requisição para download de um arquivo.
-- Transições possíveis:
+- Transição:
   - Evento: Envio do arquivo.
 
 #### Estado de Envio de Arquivo (EnviandoArquivo):
 
 - Descrição: O servidor está no processo de enviar um arquivo (download).
-- Transições possíveis:
-    - Evento: Envio bem-sucedido do arquivo.
+- Transição:
     - Evento: Recebimento de uma nova requisição.
 
 #### Estado de Exclusão (DELETE):
 
 - Descrição: O servidor recebeu uma requisição para excluir um arquivo.
-- Transições possíveis:
-  - Evento: Exclusão bem-sucedida.
-  - Evento: Recebimento de uma nova requisição.
+- Transição:
+  - Evento: Exclusão de Arquivo.
 
 #### Estado de Erro (Erro):
 
 - Descrição: O servidor encontrou um erro durante o processamento da requisição.
-- Transições possíveis:
+- Transição:
   - Evento: Recebimento de uma nova requisição.
 
 
