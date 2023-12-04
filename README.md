@@ -164,8 +164,8 @@ Uma sequencia de bytes que representa uma lista de arquivos.
 #### Tabela
 | **Cliente**     |         **Operação**            | **Servidor** |
 |:-----------:    |:---------------------------:    |:------------:|
-|     ==>         |      Requisita conexão          |              |
-|                 |      Estabelece conexão         |      <==     |
+|     -->         |      Requisita conexão          |              |
+|                 |      Estabelece conexão         |      <--     |
 |     -->         |   mensagem: requisição LIST     |              |
 |                 |            Lista                |      <--     |
 |     -->         |  mensagem: requisição UPLOAD    |              |
