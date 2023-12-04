@@ -26,7 +26,7 @@ A aplicação utiliza as pastas específicas "files" no lado do servidor e "down
 
 ### Estrutura das Pastas
 
-1. **Servidor (files):** A pasta "files" no lado do servidor é utilizada para armazenar os arquivos que podem ser baixados e deletados os pelos clientes.
+1. **Servidor (files):** A pasta "files" no lado do servidor é utilizada para armazenar os arquivos enviados pelo cliente e que podem ser baixados e/ou deletados os pelos clientes.
 
 2. **Cliente (downloads):** A pasta "downloads" no lado do cliente é reservada para armazenar os arquivos recebidos do servidor.
 
